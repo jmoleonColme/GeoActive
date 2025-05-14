@@ -1,4 +1,4 @@
-    // Funciones para manejar los activos
+// Funciones para manejar los activos
     const API_BASE_URL = '/api/activos';
 
     // Función para obtener el header de autorización
@@ -201,12 +201,14 @@
             const response = await fetch(API_BASE_URL, {
                 headers: getAuthHeader()
             });
-            if (!response.ok) throw new Error('Error al obtener activos');
+            if (!response.ok) {
+                throw new Error(`Error al obtener activos: ${response.statusText}`);
+            }
             const activos = await response.json();
             mostrarActivos(activos);
         } catch (error) {
             console.error('Error:', error);
-            alert('Error al cargar los activos');
+            alert('Error al cargar los activos. Por favor, intente nuevamente.');
         }
     }
 
@@ -461,4 +463,4 @@
         if (isAuthenticated()) {
             mostrarDashboard(); // Mostrar dashboard por defecto
         }
-    }); 
+    });

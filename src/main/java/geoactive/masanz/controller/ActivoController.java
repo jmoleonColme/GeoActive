@@ -24,9 +24,13 @@ public class ActivoController {
 
     private Usuario verificarAutenticacion(String token) throws Exception {
         if (token == null || !token.startsWith("Bearer ")) {
-            throw new RuntimeException("Token no válido");
+            throw new IllegalArgumentException("Token no válido");
         }
-        return authService.verificarToken(token.substring(7));
+        Usuario usuario = authService.verificarToken(token.substring(7));
+        if (usuario == null) {
+            throw new RuntimeException("Usuario no autenticado");
+        }
+        return usuario;
     }
 
     @GetMapping
@@ -73,6 +77,9 @@ public class ActivoController {
         if (!authService.tienePermiso(usuario, "actualizar")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+        if (!activoService.existeActivo(id)) {
+            return ResponseEntity.notFound().build();
+        }
         activo.setId(id);
         activoService.actualizarActivo(id, activo);
         return ResponseEntity.ok().build();
@@ -86,7 +93,10 @@ public class ActivoController {
         if (!authService.tienePermiso(usuario, "eliminar")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+        if (!activoService.existeActivo(id)) {
+            return ResponseEntity.notFound().build();
+        }
         activoService.eliminarActivo(id);
         return ResponseEntity.ok().build();
     }
-} 
+}
